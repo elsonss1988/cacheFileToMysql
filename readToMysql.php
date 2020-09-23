@@ -33,15 +33,20 @@ while(! feof($fh)){
     echo $buffer;
 
     //$campoArray=array("id","idlive","nome","email","especialidade","senha","empresa","cargo","flag_login","flag_logado","tempo_session","hora_login","token","outro_login","nivel","uf","crm","Telefone","profissao","termo_aceite","cidade","coren","crf");
-    $campoArray=array("idlive","nome","email","especialidade","senha","empresa","cargo","flag_login","flag_logado","tempo_session","hora_login","token","outro_login","nivel","uf","crm","Telefone","profissao","termo_aceite","cidade","coren","crf");
-
+    $campoArray=array("id","idlive","nome","email","especialidade","senha","empresa","cargo","flag_login","flag_logado","tempo_session","hora_login","token","outro_login","nivel","uf","crm","Telefone","profissao","termo_aceite","cidade","coren","crf");
     foreach ($campoArray as $value){
         if (strpos($buffer,$value) == true){
             $dadoArray=explode(":",$buffer);
             $campo=trim(str_replace(array('\'', '"'), '',$dadoArray[0]));
-            $valor=trim(str_replace(array('\'', '"',','), '',$dadoArray[1]));
-            //$valor=(int)(str_replace(array('\'', '"',','), '',$dadoArray[1]));
-            echo recordDB($campo,$valor);
+            $valor=trim(str_replace(array('\'', '"',',','<br>'), '',$dadoArray[1]));
+           
+            if( $campo=="id"){
+                $id=(int)(trim(str_replace(array('\'','"',','),'',$dadoArray[1])));
+            }
+            if( $campo!="id"){
+                //$valor=(int)(str_replace(array('\'', '"',','), '',$dadoArray[1]));
+                echo recordDB($campo,$valor,$id);
+            }
         };
     }   
 }
@@ -58,9 +63,10 @@ fclose($fh);
 ?>
 
 <?php
-function recordDB($campo,$valor){
-echo "<strong>"."******".$campo."</strong><br>";
-echo "<strong>"."******".$valor."</strong><br>";
+function recordDB($campo,$valor,$id){
+echo "<strong>"."****CAMPO:  ".$campo."***</strong><br>";
+echo "<strong>"."****VALOR:  ".$valor."***</strong><br>";
+echo "<strong>"."****ID: ".$id."***</strong><br>";
 // include connection definition
 include("conexao.php");
 //Connection and Error MSG
@@ -68,10 +74,10 @@ include("conexao.php");
    
     //$con= new PDO("mysql:host=$host;dbname=$database",$user,$pass);
     if($con->connect_error){ die("falha na conexão".$conn->connect_error);}
-    //echo "UPDATE incricoes SET `$campo`='$valor' WHERE id=1 <br>";
+    echo "UPDATE incricoes SET `$campo`='$valor' WHERE id=$id <br>";
     //$stmt= $con->prepare("SELECT * FROM incricoes");
     //$stmt=$con->prepare("UPDATE incricoes SET crm=119867 WHERE id=1");
-    $stmt=$con->prepare("UPDATE incricoes SET `$campo`='$valor' WHERE id=1");
+    $stmt=$con->prepare("UPDATE incricoes SET `$campo`='$valor' WHERE id=$id");
     $stmt->execute();
     $result=$stmt->get_result();
     //$outp=$result->fetch_all(MYSQLI_ASSOC);
